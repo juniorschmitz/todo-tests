@@ -1,0 +1,15 @@
+{
+  "name": "playwright-tests",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Playwright E2E tests for the Todo List app",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0"
+  }
+}

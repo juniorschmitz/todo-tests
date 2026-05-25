@@ -1,0 +1,10 @@
+node_modules
+playwright-report
+test-results
+.playwright-cache
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store

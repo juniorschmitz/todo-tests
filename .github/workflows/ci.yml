@@ -1,0 +1,59 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# FILE DESTINATION: this workflow belongs in the TESTS repo (todo-tests).
+# Move it there when you split the monorepo.
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: CI — Playwright Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout tests repo
+        uses: actions/checkout@v4
+
+      # Clone the webapp alongside the tests so webServer can start it.
+      # The WEBAPP_DIR env var tells playwright.config.js where to find it.
+      - name: Checkout webapp repo
+        uses: actions/checkout@v4
+        with:
+          repository: juniorschmitz/todo-webapp
+          path: todo-webapp
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            todo-webapp/package-lock.json
+
+      - name: Install webapp dependencies
+        run: npm ci
+        working-directory: todo-webapp
+
+      - name: Install Playwright and browsers
+        run: npm ci && npx playwright install --with-deps chromium
+
+      - name: Run tests
+        run: npm test
+        env:
+          CI: true
+          WEBAPP_DIR: ./todo-webapp
+          BASE_URL: http://localhost:5173
+
+      - name: Upload artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          retention-days: 7
+          path: |
+            test-results/
+            playwright-report/
